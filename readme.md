@@ -1,4 +1,4 @@
-Hash
+# Hash
 
 example: http://hash.ecosyste.ms/hash?algorithm=sha512&url=https://registry.npmjs.org/playwright/-/playwright-1.19.0-beta-1644595974000.tgz
 
