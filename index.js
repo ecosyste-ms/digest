@@ -4,12 +4,12 @@ const url = require('url');
 // const AbortController = require('abort-controller'); // TODO timeout after 30 seconds
 var crypto = require('crypto');
 
-async function hash(algo, url) {
+async function hash(algorithm, url) {
   // TODO support go modules hashing algo
 
   var download = await fetch(url) // TODO handle failure to load url gracefully
-  const hash = crypto.createHash(algo).update(await download.buffer()).digest('base64');
-  return {algo: hash}
+  const hash = crypto.createHash(algorithm).update(await download.buffer()).digest('base64');
+  return {algorithm, hash}
 }
 
 const handler = async function (req, res) {
