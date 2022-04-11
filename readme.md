@@ -1,8 +1,3 @@
-# Digest
-
-
-
-
 # [Ecosyste.ms: Digest](https://digest.ecosyste.ms)
 
 An open API service providing digests of packages from many open source software ecosystems and registries. 
