@@ -26,9 +26,12 @@ async function digest(algorithm, url) {
     }
 
     const digest = crypto.createHash(algorithm).update(await download.buffer()).digest('base64');
-    return {algorithm, digest, url, bytes}
+    const sri = `${algorithm}-${digest}`
+    return {algorithm, digest, url, bytes, sri}
   } catch {
     return {error: 'invalid url'}
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

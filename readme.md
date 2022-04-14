@@ -13,7 +13,8 @@ Digest example: https://digest.ecosyste.ms/digest?algorithm=sha512&url=https://r
   "algorithm": "sha512",
   "digest": "sVfNtsoIlzURL8ALf4VbP0PF93oo3XRh+snIRQmmIqBIsFIEPT/Nc++rLU98uIlW7FAuENzioqMz94V703+lqw==",
   "url": "https://registry.npmjs.org/playwright/-/playwright-1.19.0-beta-1644595974000.tgz",
-  "bytes": "7772"
+  "bytes": "7772",
+  "sri": "sha512-sVfNtsoIlzURL8ALf4VbP0PF93oo3XRh+snIRQmmIqBIsFIEPT/Nc++rLU98uIlW7FAuENzioqMz94V703+lqw=="
 }
 ```
 
