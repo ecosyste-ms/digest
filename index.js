@@ -2,17 +2,31 @@ const http = require('http')
 const fs = require('fs')
 const fetch = require('node-fetch');
 const url = require('url');
-// const AbortController = require('abort-controller'); // TODO timeout after 30 seconds
+const AbortController = require('abort-controller'); 
 var crypto = require('crypto');
 
 async function digest(algorithm, url) {
+
+  var controller = new AbortController();
+  var timeout = setTimeout(() => {
+    controller.abort();
+  }, 1000*30);
+
   try{
     algorithm = (typeof algorithm !== 'undefined') ?  algorithm : 'sha256'
     // TODO support go modules hashing algo
 
-    var download = await fetch(url) // TODO handle failure to load url gracefully
+    var download = await fetch(url, {signal: controller.signal})
+
+    if (download.headers.get('content-length')){
+      var bytes = download.headers.get('content-length')
+    } else {
+      var downloadClone = await download.clone();
+      var bytes = (await downloadClone.text()).length
+    }
+
     const digest = crypto.createHash(algorithm).update(await download.buffer()).digest('base64');
-    return {algorithm, digest, url}
+    return {algorithm, digest, url, bytes}
   } catch {
     return {error: 'invalid url'}
   }
