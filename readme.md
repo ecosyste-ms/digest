@@ -6,7 +6,7 @@ This project is part of [Ecosyste.ms](https://ecosyste.ms): Tools and open datas
 
 ## API
 
-example: http://digest.ecosyste.ms/digest?algorithm=sha512&url=https://registry.npmjs.org/playwright/-/playwright-1.19.0-beta-1644595974000.tgz
+Digest example: https://digest.ecosyste.ms/digest?algorithm=sha512&url=https://registry.npmjs.org/playwright/-/playwright-1.19.0-beta-1644595974000.tgz
 
 ```json
 {
@@ -14,6 +14,27 @@ example: http://digest.ecosyste.ms/digest?algorithm=sha512&url=https://registry.
   "hash": "sVfNtsoIlzURL8ALf4VbP0PF93oo3XRh+snIRQmmIqBIsFIEPT/Nc++rLU98uIlW7FAuENzioqMz94V703+lqw=="
 }
 ```
+
+List available algorithms: https://digest.ecosyste.ms/algorithms
+
+```json
+[
+  "RSA-MD4",
+  "RSA-MD5",
+  "RSA-MDC2",
+  "RSA-RIPEMD160",
+  "RSA-SHA1",
+  "RSA-SHA1-2",
+  ...
+  "ssl3-md5",
+  "ssl3-sha1",
+  "whirlpool"
+]
+```
+
+<!-- Documentation for the REST API is available here: [https://digest.ecosyste.ms/docs](https://digest.ecosyste.ms/docs)
+
+The default rate limit for the API is 5000/req per hour based on your IP address, get in contact if you need to to increase your rate limit. -->
 
 ## Development
 
