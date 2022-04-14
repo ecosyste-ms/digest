@@ -10,6 +10,6 @@
   "author": "Andrew Nesbitt",
   "license": "AGPL-3.0-only",
   "dependencies": {
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^3.2.3"
   }
 }
