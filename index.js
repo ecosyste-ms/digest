@@ -5,7 +5,7 @@ const url = require('url');
 const AbortController = require('abort-controller'); 
 var crypto = require('crypto');
 
-async function digest(algorithm, url) {
+async function digest(algorithm, encoding, url) {
 
   var controller = new AbortController();
   var timeout = setTimeout(() => {
@@ -14,6 +14,7 @@ async function digest(algorithm, url) {
 
   try{
     algorithm = (typeof algorithm !== 'undefined') ?  algorithm : 'sha256'
+    encoding = (typeof encoding !== 'undefined') ?  encoding : 'hex'
     // TODO support go modules hashing algo
 
     var download = await fetch(url, {signal: controller.signal})
@@ -25,9 +26,9 @@ async function digest(algorithm, url) {
       var bytes = (await downloadClone.text()).length
     }
 
-    const digest = crypto.createHash(algorithm).update(await download.buffer()).digest('base64');
+    const digest = crypto.createHash(algorithm).update(await download.buffer()).digest(encoding);
     const sri = `${algorithm}-${digest}`
-    return {algorithm, digest, url, bytes, sri}
+    return {algorithm, encoding, digest, url, bytes, sri}
   } catch {
     return {error: 'invalid url'}
   } finally {
@@ -41,7 +42,7 @@ const handler = async function (req, res) {
 
   if (parsedUrl.pathname == '/digest') {
     if(query.url){
-      var result = await digest(query.algorithm, query.url)
+      var result = await digest(query.algorithm, query.encoding, query.url)
     } else {
       var result = {error: 'invalid parameters, url must be provided'}
     }

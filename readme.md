@@ -6,11 +6,12 @@ This project is part of [Ecosyste.ms](https://ecosyste.ms): Tools and open datas
 
 ## API
 
-Digest example: https://digest.ecosyste.ms/digest?algorithm=sha512&url=https://registry.npmjs.org/playwright/-/playwright-1.19.0-beta-1644595974000.tgz
+Digest example: https://digest.ecosyste.ms/digest?algorithm=sha512&encoding=base64&url=https://registry.npmjs.org/playwright/-/playwright-1.19.0-beta-1644595974000.tgz
 
 ```json
 {
   "algorithm": "sha512",
+  "encoding": "base64",
   "digest": "sVfNtsoIlzURL8ALf4VbP0PF93oo3XRh+snIRQmmIqBIsFIEPT/Nc++rLU98uIlW7FAuENzioqMz94V703+lqw==",
   "url": "https://registry.npmjs.org/playwright/-/playwright-1.19.0-beta-1644595974000.tgz",
   "bytes": "7772",
@@ -34,6 +35,8 @@ List available algorithms: https://digest.ecosyste.ms/algorithms
   "whirlpool"
 ]
 ```
+
+Possible encoding options: `base64`, `hex`, `base64url`
 
 <!-- Documentation for the REST API is available here: [https://digest.ecosyste.ms/docs](https://digest.ecosyste.ms/docs)
 
