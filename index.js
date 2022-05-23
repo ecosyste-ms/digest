@@ -18,6 +18,8 @@ async function digest(algorithm, encoding, url) {
     // TODO support go modules hashing algo
 
     var download = await fetch(url, {signal: controller.signal})
+    // TODO only digest if response is a success (example: 403 with body - https://rubygems.org/downloads/sorbet-static-0.4.5125.gem)
+    // TODO check its correctly following redirects 
 
     if (download.headers.get('content-length')){
       var bytes = download.headers.get('content-length')
