@@ -11,6 +11,6 @@
   "license": "AGPL-3.0-only",
   "dependencies": {
     "abort-controller": "^3.0.0",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^3.2.5"
   }
 }
