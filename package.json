@@ -4,11 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test",
     "start": "node index.js"
   },
   "author": "Andrew Nesbitt",
   "license": "AGPL-3.0-only",
+  "engines": {
+    "node": ">=18"
+  }
   "dependencies": {
     "abort-controller": "^3.0.0",
     "node-fetch": "^2.6.7"
