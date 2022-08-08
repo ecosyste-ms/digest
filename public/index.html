@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+      Ecosyste.ms: Digest
+    </title>
+    <meta name="description" content="An open API service providing digests of packages from many open source software ecosystems and registries. ">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  </head>
+  <body>
+    <div class="main">
+      <div class="px-4 container-sm pt-2 mt-5 text-center">
+        <h1 class="display-5 fw-bold">
+          <a href="/" class="text-decoration-hover link-dark">Ecosyste.ms: Digest</a>
+        </h1>
+        <div class="col-lg-6 mx-auto">
+          <p class="lead mb-4">
+            An open API service providing digests of packages from many open source software ecosystems and registries. 
+          </p>
+        </div>
+      </div>
+
+      <div class="col-lg-4 container-sm text-center">
+        <form class="row g-2 justify-content-center" action='/digest'>
+          <div class="col-auto">
+            <label for="repo_name" class="visually-hidden">Tarball URL</label>
+            <input name='url' type="text" class="form-control" id="repo_name" placeholder="URL: eg https://registry.npmjs.org/playwright/-/playwright-1.0.2.tgz" size="50">
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-primary mb-3">Digest</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <footer class="py-5 container-sm text-muted text-center">
+      <a class="link-dark" target="_blank" href="https://ecosyste.ms">Ecosyste.ms</a> — 
+      <a class="link-dark" target="_blank" href="https://github.com/ecosyste-ms/digest">GitHub</a> — 
+      <a class="link-dark" target="_blank" href="https://opencollective.com/ecosystems">Open Collective</a> — 
+      <a class="link-dark" target="_blank" href="https://twitter.com/ecosyste_ms">Twitter</a> — 
+      <a class="link-dark" href="https://github.com/ecosyste-ms/digest/blob/main/LICENSE">AGPL-3</a>  — 
+      <br/>
+      Code: <a class="link-dark" href="https://github.com/ecosyste-ms/digest/blob/main/LICENSE">AGPL-3</a>  — 
+      Data: <a class="link-dark" target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>
+    </footer>
+  </body>
+</html>

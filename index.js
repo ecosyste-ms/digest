@@ -1,74 +1,25 @@
-const http = require('http')
-const fs = require('fs')
-const fetch = require('node-fetch');
-const url = require('url');
-const AbortController = require('abort-controller'); 
+const express = require('express')
+const app = express()
 var crypto = require('crypto');
+var calculateDigest = require('./digest.js')
+const port = process.env.PORT || 8080
 
-async function digest(algorithm, encoding, url) {
+app.use(express.static('public'))
 
-  var controller = new AbortController();
-  var timeout = setTimeout(() => {
-    controller.abort();
-  }, 1000*30);
-
+app.get('/digest', async (req, res) => {
   try{
-    algorithm = (typeof algorithm !== 'undefined') ?  algorithm : 'sha256'
-    encoding = (typeof encoding !== 'undefined') ?  encoding : 'hex'
-    // TODO support go modules hashing algo
-
-    var download = await fetch(url, {signal: controller.signal})
-    // TODO only digest if response is a success (example: 403 with body - https://rubygems.org/downloads/sorbet-static-0.4.5125.gem)
-    // TODO check its correctly following redirects 
-
-    if (download.headers.get('content-length')){
-      var bytes = download.headers.get('content-length')
-    } else {
-      var downloadClone = await download.clone();
-      var bytes = (await downloadClone.text()).length
-    }
-
-    const digest = crypto.createHash(algorithm).update(await download.buffer()).digest(encoding);
-    const sri = `${algorithm}-${digest}`
-    return {algorithm, encoding, digest, url, bytes, sri}
-  } catch {
-    return {error: 'invalid url'}
-  } finally {
-    clearTimeout(timeout);
+    var digest = await calculateDigest(req.query.algorithm, req.query.encoding, req.query.url)
+    res.send(digest)
+  } catch(error) {
+    console.log(error)
+    res.send({error: error})
   }
-}
+})
 
-const handler = async function (req, res) {
-  var parsedUrl = url.parse(req.url,true)
-  var query = parsedUrl.query
+app.get('/algorithms', (req, res) => {
+  res.send(crypto.getHashes());
+})
 
-  if (parsedUrl.pathname == '/digest') {
-    if(query.url){
-      var result = await digest(query.algorithm, query.encoding, query.url)
-    } else {
-      var result = {error: 'invalid parameters, url must be provided'}
-    }
-    res.setHeader('Content-Type', 'application/json');
-
-    if (result.digest){
-      res.writeHead(200);
-    } else {
-      res.writeHead(500);
-    }
-
-    res.end(JSON.stringify(result));
-  } else if (parsedUrl.pathname == '/algorithms') {
-    var algorithms = crypto.getHashes();
-    res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify(algorithms));
-  } else if (parsedUrl.pathname == '/') {
-    res.writeHead(200, { 'content-type': 'text/html' })
-    fs.createReadStream('index.html').pipe(res)
-  } else {
-    res.writeHead(404);
-    res.end('404')
-  } 
-}
-
-const server = http.createServer(handler);
-server.listen(process.env.PORT || 8080);
+app.listen(port, () => {
+  console.log(`Listening on port ${port}`)
+})
