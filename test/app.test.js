@@ -4,6 +4,8 @@ var http = require('node:http');
 var crypto = require('node:crypto');
 var { createApp } = require('../app.js');
 
+var fixtureContent = 'test fixture content';
+
 function request(server, path) {
   return new Promise((resolve, reject) => {
     var address = server.address();
@@ -28,6 +30,27 @@ function request(server, path) {
     req.end();
   });
 }
+
+var fixtureServer;
+var fixtureUrl;
+
+before(() => {
+  return new Promise((resolve) => {
+    fixtureServer = http.createServer((req, res) => {
+      res.writeHead(200, { 'content-length': String(Buffer.byteLength(fixtureContent)) });
+      res.end(fixtureContent);
+    });
+    fixtureServer.listen(0, () => {
+      var addr = fixtureServer.address();
+      fixtureUrl = `http://localhost:${addr.port}/file`;
+      resolve();
+    });
+  });
+});
+
+after(() => {
+  fixtureServer.close();
+});
 
 describe('GET /algorithms', () => {
   var server;
@@ -82,12 +105,12 @@ describe('GET /digest', () => {
   });
 
   it('returns 200 status', async () => {
-    var res = await request(server, '/digest?url=https://httpbin.org/robots.txt');
+    var res = await request(server, `/digest?url=${fixtureUrl}`);
     assert.strictEqual(res.status, 200);
   });
 
   it('returns JSON with digest fields', async () => {
-    var res = await request(server, '/digest?url=https://httpbin.org/robots.txt');
+    var res = await request(server, `/digest?url=${fixtureUrl}`);
     var data = res.json();
     assert.ok(data.algorithm);
     assert.ok(data.encoding);
@@ -97,31 +120,42 @@ describe('GET /digest', () => {
   });
 
   it('defaults to sha256 algorithm', async () => {
-    var res = await request(server, '/digest?url=https://httpbin.org/robots.txt');
+    var res = await request(server, `/digest?url=${fixtureUrl}`);
     var data = res.json();
     assert.strictEqual(data.algorithm, 'sha256');
   });
 
   it('defaults to hex encoding', async () => {
-    var res = await request(server, '/digest?url=https://httpbin.org/robots.txt');
+    var res = await request(server, `/digest?url=${fixtureUrl}`);
     var data = res.json();
     assert.strictEqual(data.encoding, 'hex');
   });
 
+  it('returns correct digest value', async () => {
+    var res = await request(server, `/digest?url=${fixtureUrl}`);
+    var data = res.json();
+    var expected = crypto.createHash('sha256').update(fixtureContent).digest('hex');
+    assert.strictEqual(data.digest, expected);
+  });
+
   it('respects custom algorithm', async () => {
-    var res = await request(server, '/digest?url=https://httpbin.org/robots.txt&algorithm=md5');
+    var res = await request(server, `/digest?url=${fixtureUrl}&algorithm=md5`);
     var data = res.json();
     assert.strictEqual(data.algorithm, 'md5');
+    var expected = crypto.createHash('md5').update(fixtureContent).digest('hex');
+    assert.strictEqual(data.digest, expected);
   });
 
   it('respects custom encoding', async () => {
-    var res = await request(server, '/digest?url=https://httpbin.org/robots.txt&encoding=base64');
+    var res = await request(server, `/digest?url=${fixtureUrl}&encoding=base64`);
     var data = res.json();
     assert.strictEqual(data.encoding, 'base64');
+    var expected = crypto.createHash('sha256').update(fixtureContent).digest('base64');
+    assert.strictEqual(data.digest, expected);
   });
 
   it('returns SRI format', async () => {
-    var res = await request(server, '/digest?url=https://httpbin.org/robots.txt');
+    var res = await request(server, `/digest?url=${fixtureUrl}`);
     var data = res.json();
     assert.ok(data.sri.startsWith('sha256-'));
   });
