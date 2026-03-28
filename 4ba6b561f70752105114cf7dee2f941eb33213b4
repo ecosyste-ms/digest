@@ -1,0 +1,23 @@
+digest.js
+  84583f3b69dcd8d8 8-16,18-23,26-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.20",
+  "base_commit_sha": "4ba6b561f70752105114cf7dee2f941eb33213b4",
+  "prompts": {
+    "84583f3b69dcd8d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c99b996b-7410-44e6-ae16-03d08c79e967",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Andrew Nesbitt <andrewnez@gmail.com>",
+      "messages": [],
+      "total_additions": 17,
+      "total_deletions": 16,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    }
+  }
+}
