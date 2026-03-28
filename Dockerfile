@@ -1,4 +1,4 @@
-FROM node:25.8.1-alpine
+FROM node:25.8.2-alpine
 WORKDIR /usr/src/app
 
 COPY . /usr/src/app
