@@ -1,27 +1,73 @@
-const express = require('express')
-var crypto = require('crypto');
-var calculateDigest = require('./digest.js')
+var http = require('node:http');
+var fs = require('node:fs');
+var path = require('node:path');
+var crypto = require('node:crypto');
+var calculateDigest = require('./digest.js');
 
-function createApp() {
-  const app = express()
+var MIME_TYPES = {
+    '.html': 'text/html',
+    '.ico': 'image/x-icon'
+};
 
-  app.use(express.static('public'))
+var publicDir = path.join(__dirname, 'public');
 
-  app.get('/digest', async (req, res) => {
-    try{
-      var digest = await calculateDigest(req.query.algorithm, req.query.encoding, req.query.url)
-      res.send(digest)
-    } catch(error) {
-      console.log(error)
-      res.send({error: error})
+function serveStatic(req, res) {
+    var filePath = req.url === '/' ? '/index.html' : req.url;
+    var fullPath = path.join(publicDir, filePath);
+
+    if (!fullPath.startsWith(publicDir)) {
+        res.writeHead(403);
+        res.end();
+        return true;
     }
-  })
 
-  app.get('/algorithms', (req, res) => {
-    res.send(crypto.getHashes());
-  })
+    try {
+        var data = fs.readFileSync(fullPath);
+    } catch {
+        return false;
+    }
 
-  return app
+    var ext = path.extname(fullPath);
+    var contentType = MIME_TYPES[ext] || 'application/octet-stream';
+    res.writeHead(200, { 'content-type': contentType });
+    res.end(data);
+    return true;
 }
 
-module.exports = { createApp }
+function createApp() {
+    var server = http.createServer(async (req, res) => {
+        var url = new URL(req.url, `http://${req.headers.host}`);
+
+        if (url.pathname === '/digest' && req.method === 'GET') {
+            try {
+                var digest = await calculateDigest(
+                    url.searchParams.get('algorithm') || undefined,
+                    url.searchParams.get('encoding') || undefined,
+                    url.searchParams.get('url')
+                );
+                res.writeHead(200, { 'content-type': 'application/json' });
+                res.end(JSON.stringify(digest));
+            } catch (error) {
+                console.log(error);
+                res.writeHead(200, { 'content-type': 'application/json' });
+                res.end(JSON.stringify({ error: error }));
+            }
+            return;
+        }
+
+        if (url.pathname === '/algorithms' && req.method === 'GET') {
+            res.writeHead(200, { 'content-type': 'application/json' });
+            res.end(JSON.stringify(crypto.getHashes()));
+            return;
+        }
+
+        if (serveStatic(req, res)) return;
+
+        res.writeHead(404);
+        res.end();
+    });
+
+    return server;
+}
+
+module.exports = { createApp };

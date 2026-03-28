@@ -1,8 +1,8 @@
-const { createApp } = require('./app.js')
-const port = process.env.PORT || 8080
+var { createApp } = require('./app.js')
+var port = process.env.PORT || 8080
 
-const app = createApp()
+var server = createApp()
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Listening on port ${port}`)
 })
