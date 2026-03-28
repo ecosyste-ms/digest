@@ -1,0 +1,23 @@
+Dockerfile
+  a4861e0edb2cc3fc 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.22",
+  "base_commit_sha": "1a8dacbeaa4287efb1076585d5ed91e66a626e9b",
+  "prompts": {
+    "a4861e0edb2cc3fc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ce6f8676-f7eb-4a4a-a325-4350e49427d7",
+        "model": "claude-opus-4-6"
+      },
+      "human_author": "Andrew Nesbitt <andrewnez@gmail.com>",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 7,
+      "accepted_lines": 1,
+      "overriden_lines": 0
+    }
+  }
+}
