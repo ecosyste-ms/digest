@@ -6,7 +6,9 @@ var calculateDigest = require('./digest.js');
 
 var MIME_TYPES = {
     '.html': 'text/html',
-    '.ico': 'image/x-icon'
+    '.ico': 'image/x-icon',
+    '.yaml': 'application/yaml',
+    '.yml': 'application/yaml'
 };
 
 var publicDir = path.join(__dirname, 'public');
@@ -58,6 +60,32 @@ function createApp() {
         if (url.pathname === '/algorithms' && req.method === 'GET') {
             res.writeHead(200, { 'content-type': 'application/json' });
             res.end(JSON.stringify(crypto.getHashes()));
+            return;
+        }
+
+        if (url.pathname === '/docs' && req.method === 'GET') {
+            res.writeHead(200, { 'content-type': 'text/html' });
+            res.end(`<!doctype html>
+<html>
+  <head>
+    <title>Ecosyste.ms Digest API docs</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script>
+      window.onload = () => {
+        window.ui = SwaggerUIBundle({
+          url: '/openapi.yaml',
+          dom_id: '#swagger-ui'
+        });
+      };
+    </script>
+  </body>
+</html>`);
             return;
         }
 

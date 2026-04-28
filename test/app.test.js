@@ -185,6 +185,34 @@ describe('static files', () => {
   });
 });
 
+
+describe('API documentation', () => {
+  var server;
+
+  before(() => {
+    var app = createApp();
+    server = app.listen(0);
+  });
+
+  after(() => {
+    server.close();
+  });
+
+  it('serves openapi.yaml', async () => {
+    var res = await request(server, '/openapi.yaml');
+    assert.strictEqual(res.status, 200);
+    assert.ok(res.headers['content-type'].includes('application/yaml'));
+    assert.ok(res.body.includes('openapi: 3.0.3'));
+  });
+
+  it('serves swagger docs at /docs', async () => {
+    var res = await request(server, '/docs');
+    assert.strictEqual(res.status, 200);
+    assert.ok(res.headers['content-type'].includes('text/html'));
+    assert.ok(res.body.includes('/openapi.yaml'));
+  });
+});
+
 describe('404 handling', () => {
   var server;
 

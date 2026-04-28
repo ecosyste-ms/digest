@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: Ecosyste.ms Digest API
+  version: 1.0.0
+  description: |
+    API for calculating package/file digests and listing supported hashing
+    algorithms.
+servers:
+  - url: /
+paths:
+  /algorithms:
+    get:
+      summary: List supported hashing algorithms
+      responses:
+        '200':
+          description: Array of algorithm names supported by Node.js crypto
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+              example:
+                - sha256
+                - sha512
+                - md5
+  /digest:
+    get:
+      summary: Calculate a digest for a remote URL
+      parameters:
+        - name: url
+          in: query
+          required: true
+          description: URL of the file to fetch and digest
+          schema:
+            type: string
+            format: uri
+          example: https://registry.npmjs.org/playwright/-/playwright-1.0.2.tgz
+        - name: algorithm
+          in: query
+          required: false
+          description: Hash algorithm. Defaults to sha256.
+          schema:
+            type: string
+            default: sha256
+          example: sha256
+        - name: encoding
+          in: query
+          required: false
+          description: Digest encoding. Defaults to hex.
+          schema:
+            type: string
+            default: hex
+          example: hex
+      responses:
+        '200':
+          description: Digest result or error payload
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/DigestResponse'
+                  - $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    DigestResponse:
+      type: object
+      required:
+        - algorithm
+        - encoding
+        - digest
+        - url
+        - bytes
+        - sri
+      properties:
+        algorithm:
+          type: string
+          example: sha256
+        encoding:
+          type: string
+          example: hex
+        digest:
+          type: string
+          example: c0ffee
+        url:
+          type: string
+          format: uri
+        bytes:
+          type: string
+          description: Number of bytes fetched as a string.
+          example: '12345'
+        sri:
+          type: string
+          example: sha256-c0ffee
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          description: Error returned while fetching or digesting the URL.
