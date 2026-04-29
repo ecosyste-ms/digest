@@ -161,6 +161,35 @@ describe('GET /digest', () => {
   });
 });
 
+
+describe('rate limiting', () => {
+  var server;
+
+  before(() => {
+    var app = createApp({ rateLimit: { windowMs: 1000, maxRequests: 2 } });
+    server = app.listen(0);
+  });
+
+  after(() => {
+    server.close();
+  });
+
+  it('returns rate limit headers', async () => {
+    var res = await request(server, '/algorithms');
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(res.headers['ratelimit-limit'], '2');
+    assert.strictEqual(res.headers['ratelimit-remaining'], '1');
+  });
+
+  it('returns 429 after too many requests', async () => {
+    await request(server, '/algorithms');
+    var res = await request(server, '/algorithms');
+    assert.strictEqual(res.status, 429);
+    assert.ok(res.headers['retry-after']);
+    assert.deepStrictEqual(res.json(), { error: 'rate limit exceeded' });
+  });
+});
+
 describe('static files', () => {
   var server;
 
