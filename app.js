@@ -13,6 +13,49 @@ var MIME_TYPES = {
 
 var publicDir = path.join(__dirname, 'public');
 
+var RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10);
+var RATE_LIMIT_MAX_REQUESTS = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '60', 10);
+
+function rateLimitKey(req) {
+    return req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress || 'unknown';
+}
+
+function createRateLimiter(options = {}) {
+    var windowMs = options.windowMs || RATE_LIMIT_WINDOW_MS;
+    var maxRequests = options.maxRequests || RATE_LIMIT_MAX_REQUESTS;
+    var clients = new Map();
+
+    return function rateLimiter(req, res) {
+        if (maxRequests <= 0) return false;
+
+        var now = Date.now();
+        var key = rateLimitKey(req);
+        var record = clients.get(key);
+
+        if (!record || record.resetAt <= now) {
+            record = { count: 0, resetAt: now + windowMs };
+            clients.set(key, record);
+        }
+
+        record.count += 1;
+        var remaining = Math.max(maxRequests - record.count, 0);
+        var resetSeconds = Math.ceil((record.resetAt - now) / 1000);
+
+        res.setHeader('RateLimit-Limit', String(maxRequests));
+        res.setHeader('RateLimit-Remaining', String(remaining));
+        res.setHeader('RateLimit-Reset', String(resetSeconds));
+
+        if (record.count > maxRequests) {
+            res.setHeader('Retry-After', String(resetSeconds));
+            res.writeHead(429, { 'content-type': 'application/json' });
+            res.end(JSON.stringify({ error: 'rate limit exceeded' }));
+            return true;
+        }
+
+        return false;
+    };
+}
+
 function serveStatic(req, res) {
     var filePath = req.url === '/' ? '/index.html' : req.url;
     var fullPath = path.join(publicDir, filePath);
@@ -36,8 +79,11 @@ function serveStatic(req, res) {
     return true;
 }
 
-function createApp() {
+function createApp(options = {}) {
+    var rateLimiter = createRateLimiter(options.rateLimit || {});
+
     var server = http.createServer(async (req, res) => {
+        if (rateLimiter(req, res)) return;
         var url = new URL(req.url, `http://${req.headers.host}`);
 
         if (url.pathname === '/digest' && req.method === 'GET') {
@@ -98,4 +144,4 @@ function createApp() {
     return server;
 }
 
-module.exports = { createApp };
+module.exports = { createApp, createRateLimiter };
