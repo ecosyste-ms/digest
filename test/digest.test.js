@@ -94,9 +94,11 @@ describe('calculateDigest', () => {
         assert.strictEqual(result.digest, expected);
     });
 
-    it('hashes binary content as string', async () => {
+    it('hashes binary content by raw bytes, not utf-8 decoded text', async () => {
         var result = await calculateDigest(undefined, undefined, testUrl + '/binary');
-        assert.ok(result.digest);
-        assert.strictEqual(result.algorithm, 'sha256');
+        var raw = Buffer.from([0x00, 0x01, 0x02, 0xff]);
+        var expected = crypto.createHash('sha256').update(raw).digest('hex');
+        assert.strictEqual(result.digest, expected);
+        assert.strictEqual(result.bytes, String(raw.length));
     });
 });
