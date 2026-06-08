@@ -17,13 +17,13 @@ async function calculateDigest(algorithm, encoding, url) {
     // TODO only digest if response is a success (example: 403 with body - https://rubygems.org/downloads/sorbet-static-0.4.5125.gem)
 
     var bytes = response.headers.get('content-length');
-    var body = await response.text();
+    var buf = Buffer.from(await response.arrayBuffer());
 
     if (!bytes) {
-      bytes = String(Buffer.byteLength(body));
+      bytes = String(buf.length);
     }
 
-    var digest = crypto.createHash(algorithm).update(body).digest(encoding);
+    var digest = crypto.createHash(algorithm).update(buf).digest(encoding);
     var sri = `${algorithm}-${digest}`
     return {algorithm, encoding, digest, url, bytes, sri}
 }
